@@ -46,6 +46,10 @@ class QTServer(QWidget):
         self.event_button.clicked.connect(self.create_event)
         self.layout.addWidget(self.event_button)
 
+        self.camp_button = QPushButton("Define Camps")
+        self.camp_button.clicked.connect(self.define_camps)
+        self.layout.addWidget(self.camp_button)
+
 
         loop.call_soon(lambda: loop.create_task(self.running_task()))
         self.server_task = None
@@ -95,18 +99,18 @@ class QTServer(QWidget):
     
     def define_camps(self):
         if self.camp_window is not None:
+            print(f"Camp window exists")
             self.camp_window.close()
         self.camp_window = campWindow(self)
         self.camp_window.show()
 
 
     def clear_windows(self):
-        for window in [self.camp_window, self.event_window, self.names_window]:
-            if window is None:
-                continue
-            else:
-                window = None
-                window.close()
+        self.camp_window = None
+        self.event_window = None
+        self.names_window = None
+            
+                
 
     def handle_new_event(self,event : dict):
         """
@@ -140,7 +144,7 @@ class QTServer(QWidget):
     
     def set_camps(self, camps):
         self.camps = camps
-        self.server.send_camps(self.camps)
+        asyncio.create_task(self.server.send_camps(self.camps))
 
     
     def closeEvent(self, a0):
@@ -302,7 +306,7 @@ class nameWindow(QWidget):
 class campWindow(QWidget):
 
     def __init__(self, mainwindow : QTServer):
-        
+        super().__init__()
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
