@@ -16,6 +16,8 @@ class Server:
         self.scores = {}
         self.update_round = Shared.signals.Signal()
         self.start_game = Shared.signals.Signal()
+        self.running = False
+        self.camps = 3
         
 
     async def handler(self, websocket : websockets.ClientConnection):
@@ -32,10 +34,11 @@ class Server:
         try:
 
             if self.game.num_players == self.NUM_PLAYERS:
+                self.running = True
                 for ws in self.connected:
                     print(self.game.num_players)
                     await self.start_game.emit(ID_players = self.ID_PLAYERS)
-                    await ws.send(json.dumps({"STARTGAME" : list(self.ID_PLAYERS.keys())}).encode())
+                    await ws.send(json.dumps({"STARTGAME" : list(self.ID_PLAYERS.keys()), "CAMPS" : self.camps}).encode())
 
             async for msg in websocket:
                 print(f"received message: {msg}")
@@ -75,6 +78,12 @@ class Server:
     
     async def _close(self):
         print("Closing server")
+    
+    async def send_camps(self,camps):
+        self.camps = camps
+        if self.running:
+            for client in self.connected:
+                await client.send(json.dumps({"CAMPS" : self.camps}).encode())
         
         
 

@@ -35,8 +35,11 @@ class QTServer(QWidget):
         
         self.equation = Server.Equations.equation([])
 
-        self.new_window = None
-        self.layout : QGridLayout = QGridLayout()
+        self.event_window = None
+        self.camp_window = None
+        self.names_window = None
+        # self.layout : QGridLayout = QGridLayout()
+        self.layout : QVBoxLayout = QVBoxLayout()
         self.setLayout(self.layout)
 
         self.event_button =QPushButton("Create Event")
@@ -84,14 +87,26 @@ class QTServer(QWidget):
 
 
     def create_event(self):
-        if self.new_window is not None:
-            self.new_window.close()
+        if self.event_window is not None:
+            self.event_window.close()
         print("attempting to create event window")
-        self.new_window = eventWindow(self.server.ID_PLAYERS, self)
-        self.new_window.show()
+        self.event_window = eventWindow(self.server.ID_PLAYERS, self)
+        self.event_window.show()
     
-    def clear_window(self):
-        self.new_window = None
+    def define_camps(self):
+        if self.camp_window is not None:
+            self.camp_window.close()
+        self.camp_window = campWindow(self)
+        self.camp_window.show()
+
+
+    def clear_windows(self):
+        for window in [self.camp_window, self.event_window, self.names_window]:
+            if window is None:
+                continue
+            else:
+                window = None
+                window.close()
 
     def handle_new_event(self,event : dict):
         """
@@ -118,7 +133,14 @@ class QTServer(QWidget):
        
                 self.events[self.server.t][i].append(event[i])
         # print(self.events)
+    
+    def set_names(): # Need to open a window and map all the names to the player IDs
         
+        pass
+    
+    def set_camps(self, camps):
+        self.camps = camps
+        self.server.send_camps(self.camps)
 
     
     def closeEvent(self, a0):
@@ -228,13 +250,78 @@ class eventWindow(QWidget):
         # Send the event to the server
         self.format_event()
         self.mainwindow.handle_new_event(self.data)
-        self.mainwindow.clear_window()
-
-        
-
+        self.mainwindow.clear_windows()
         super().close()
         self.deleteLater()
 
+
+class nameWindow(QWidget):
+    # This class will allow the server to set the names of the players for easier allocation of sentiments
+    def __init__(self, players :dict, mainwindow : QTServer):
+        super().__init__()
+
+        self.layout : QGridLayout = QGridLayout()
+        self.setLayout(self.layout)
+
+        # Need to make the names layout
+
+        self.mainwindow = mainwindow
+
+        
+  
+        for i in range(self.from_col, self.watcher_col + 1):
+            label = QLabel(self.label_names[i])
+            self.layout.addWidget(label, self.cur_row, i)
+        self.cur_row += 1
+        for ID in players:
+            """Create a row for the player. Watcher, to and from"""
+            self.create_row(ID)
+        
+        self.submit_button = QPushButton("Submit")
+        self.submit_button.clicked.connect(self.close)
+        self.layout.addWidget(self.submit_button, self.cur_row, 0)
+
+        self.Hunt_button = QPushButton("Hunt")
+        self.Hunt_button.clicked.connect(self.set_hunt)
+        self.layout.addWidget(self.Hunt_button, self.cur_row, 1)
+
+        self.Stun_button = QPushButton("Stun")
+        self.Stun_button.clicked.connect(self.set_stun)
+        self.layout.addWidget(self.Stun_button, self.cur_row, 2)
+
+ 
+
+
+    def close(self):
+        # I need to make a QT window function that takes the names and sends them to the client.
+        self.mainwindow.clear_windows()
+        super().close()
+        self.deleteLater()
+
+
+class campWindow(QWidget):
+
+    def __init__(self, mainwindow : QTServer):
+        
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+
+
+        self.input = QLineEdit()
+        self.button = QPushButton("Submit")
+        self.button.clicked.connect(self.close)
+        self.layout.addWidget(QLabel("Number of camps:"))
+        self.layout.addWidget(self.input)
+        self.layout.addWidget(self.button)
+
+        self.mainwindow : QTServer = mainwindow
+
+    def close(self):
+        # send the information to the main server
+        self.mainwindow.set_camps(self.input.text())
+        self.mainwindow.clear_windows()
+        super().close()
+        self.deleteLater()
 
 """
 TODO:
@@ -242,6 +329,7 @@ TODO:
 - Send camps to the clients so they correctly open
 - make the UI cleaner and display the camp that is selected.
 - Save data
+- Refactor code so that it is a class that holds the windows, and the class runs the server
 """
 
 

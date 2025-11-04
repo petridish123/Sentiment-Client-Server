@@ -68,6 +68,8 @@ class QtWebsocket(QWidget):
 
         self.camp :int | None = None
 
+        self.camps : list|None = []
+
         self.run()
 
     def change_round_num(self, new_int: int):
@@ -135,6 +137,8 @@ class QtWebsocket(QWidget):
             sys.exit()
         if "ROUND" in message:
             self.change_round_num(message["ROUND"])
+        if "CAMPS" in message:
+            self.camps = [i for i in range(message["CAMPS"])]
                     
     
     def remove_player(self, ID):
@@ -172,7 +176,7 @@ class QtWebsocket(QWidget):
     def create_camp_menu(self):
         if self.window is not None:
             self.window.close()
-        self.window = campWindow([1,2,3], mainwindow=self)
+        self.window = campWindow(self.camps, mainwindow=self)
         self.window.show()
 
     def closeEvent(self, a0):
