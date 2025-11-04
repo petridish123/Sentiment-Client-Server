@@ -138,7 +138,7 @@ class QtWebsocket(QWidget):
         if "ROUND" in message:
             self.change_round_num(message["ROUND"])
         if "CAMPS" in message:
-            self.camps = [i for i in range(message["CAMPS"])]
+            self.camps = [i for i in range(1, 1 + int(message["CAMPS"]))]
                     
     
     def remove_player(self, ID):
