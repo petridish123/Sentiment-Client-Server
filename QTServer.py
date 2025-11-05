@@ -41,6 +41,7 @@ class QTServer(QWidget):
         # self.layout : QGridLayout = QGridLayout()
         self.layout : QVBoxLayout = QVBoxLayout()
         self.setLayout(self.layout)
+        self.setMinimumSize(300,150)
 
         self.event_button =QPushButton("Create Event")
         self.event_button.clicked.connect(self.create_event)

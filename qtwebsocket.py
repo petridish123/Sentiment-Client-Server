@@ -45,15 +45,6 @@ class QtWebsocket(QWidget):
         self.layout.addWidget(self.round_num_label, 0 , 0)
 
 
-
-
-        """
-        Need to add the camp button and the button to view matrix?
-
-        Need matrix to be sent over
-
-        also need camps to be sent over
-        """
         self.row = 1
         self.player : player|None = None
 
@@ -105,12 +96,13 @@ class QtWebsocket(QWidget):
 
     async def handle_message(self,message):
         message = json.loads(message.decode())
-        print(message)
+        # print(message)
         if "ID" in message:
             self.make_player(message["ID"])
 
         if "STARTGAME" in message:
             self.game_running = True
+            # self.player_ids = message["STARTGAME"]
             for i in range(len(message["STARTGAME"])):
                 player_id = message["STARTGAME"][i]
                 if not self.ID:
@@ -139,6 +131,13 @@ class QtWebsocket(QWidget):
             self.change_round_num(message["ROUND"])
         if "CAMPS" in message:
             self.camps = [i for i in range(1, 1 + int(message["CAMPS"]))]
+        if "NAMES" in message:
+            for i in message["NAMES"]:#self.players:
+                if int(i) == self.ID:
+                    self.setWindowTitle(message["NAMES"][i])
+                self.players[int(i)].change_name(message["NAMES"][i])
+
+
                     
     
     def remove_player(self, ID):

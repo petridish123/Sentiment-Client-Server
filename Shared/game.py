@@ -148,9 +148,9 @@ class sub_player:
 
     def add_player(self) -> None:
         
-        label1 = QLabel("Player: " + str(self.ID))
-        self.layout.addWidget(label1, self.cur_row, 0)
-        self.widgets.append(label1)
+        self.name = QLabel("Player: " + str(self.ID))
+        self.layout.addWidget(self.name, self.cur_row, 0)
+        self.widgets.append(self.name)
 
         self.new_label = QLabel("Sentiment: Neutral")
         self.layout.addWidget(self.new_label, self.cur_row, 6)
@@ -223,6 +223,9 @@ class sub_player:
     
     def get_score(self) -> tuple:
         return self.ID, self.current_allocation
+    
+    def change_name(self, name) -> None:
+        self.name.setText(name)
     
 
 class player_matrix:
