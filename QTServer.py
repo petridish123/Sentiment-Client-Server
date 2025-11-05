@@ -138,9 +138,10 @@ class QTServer(QWidget):
                 self.events[self.server.t][i].append(event[i])
         # print(self.events)
     
-    def set_names(): # Need to open a window and map all the names to the player IDs
+    def set_names(self, player_id_names : dict): # Need to open a window and map all the names to the player IDs
+        self.player_id_names = player_id_names
+        asyncio.create_task(self.server.send_names(self.player_id_names))
         
-        pass
     
     def set_camps(self, camps):
         self.camps = camps
@@ -271,33 +272,30 @@ class nameWindow(QWidget):
 
         self.mainwindow = mainwindow
 
-        
+        self.cur_row = 0
   
-        for i in range(self.from_col, self.watcher_col + 1):
-            label = QLabel(self.label_names[i])
-            self.layout.addWidget(label, self.cur_row, i)
-        self.cur_row += 1
+        self.names = {}
+
+
         for ID in players:
-            """Create a row for the player. Watcher, to and from"""
+            
             self.create_row(ID)
         
         self.submit_button = QPushButton("Submit")
         self.submit_button.clicked.connect(self.close)
         self.layout.addWidget(self.submit_button, self.cur_row, 0)
 
-        self.Hunt_button = QPushButton("Hunt")
-        self.Hunt_button.clicked.connect(self.set_hunt)
-        self.layout.addWidget(self.Hunt_button, self.cur_row, 1)
 
-        self.Stun_button = QPushButton("Stun")
-        self.Stun_button.clicked.connect(self.set_stun)
-        self.layout.addWidget(self.Stun_button, self.cur_row, 2)
 
- 
+    def create_row(ID:int) -> None :
+        label = QLabel(f"player {ID} :")
+
 
 
     def close(self):
         # I need to make a QT window function that takes the names and sends them to the client.
+    
+        self.mainwindow.set_names(self.names)
         self.mainwindow.clear_windows()
         super().close()
         self.deleteLater()
