@@ -39,7 +39,7 @@ class Server:
                 for ws in self.connected:
                     print(self.game.num_players)
                     await self.start_game.emit(ID_players = self.ID_PLAYERS)
-                    await ws.send(json.dumps({"STARTGAME" : list(self.ID_PLAYERS.keys()), "CAMPS" : self.camps}).encode(), "NAMES":self.names)
+                    await ws.send(json.dumps({"STARTGAME" : list(self.ID_PLAYERS.keys()), "CAMPS" : self.camps , "NAMES":self.names}).encode())
 
             async for msg in websocket:
                 print(f"received message: {msg}")
@@ -90,7 +90,7 @@ class Server:
         self.names = names
         if self.running:
             for client in self.connected:
-                await client.send(json.cumps({"NAMES" : self.names}).encode())
+                await client.send(json.dumps({"NAMES" : self.names}).encode())
         
         
 

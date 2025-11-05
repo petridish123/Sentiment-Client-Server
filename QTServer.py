@@ -50,6 +50,10 @@ class QTServer(QWidget):
         self.camp_button.clicked.connect(self.define_camps)
         self.layout.addWidget(self.camp_button)
 
+        self.names_button = QPushButton("Define Names")
+        self.names_button.clicked.connect(self.define_names)
+        self.layout.addWidget(self.names_button)
+
 
         loop.call_soon(lambda: loop.create_task(self.running_task()))
         self.server_task = None
@@ -104,6 +108,12 @@ class QTServer(QWidget):
         self.camp_window = campWindow(self)
         self.camp_window.show()
 
+    def define_names(self):
+        if self.names_window is not None:
+            print("Names window exists")
+            self.names_window.close()
+        self.names_window = nameWindow(self.server.ID_PLAYERS,self)
+        self.names_window.show()
 
     def clear_windows(self):
         self.camp_window = None
@@ -273,13 +283,13 @@ class nameWindow(QWidget):
         self.mainwindow = mainwindow
 
         self.cur_row = 0
-  
+
         self.names = {}
 
 
         for ID in players:
-            
             self.create_row(ID)
+            self.cur_row += 1
         
         self.submit_button = QPushButton("Submit")
         self.submit_button.clicked.connect(self.close)
@@ -287,14 +297,22 @@ class nameWindow(QWidget):
 
 
 
-    def create_row(ID:int) -> None :
+    def create_row(self, ID:int) -> None :
         label = QLabel(f"player {ID} :")
+        l_edit = QLineEdit()
+        self.layout.addWidget(label, self.cur_row, 0)
+        self.layout.addWidget(l_edit, self.cur_row, 1)
 
-
+        l_edit.textChanged.connect(self.update_name(ID))
+    
+    def update_name(self, ID:int) -> callable:
+        def _(new_text):
+            self.names[ID] = new_text
+        return _
 
     def close(self):
         # I need to make a QT window function that takes the names and sends them to the client.
-    
+        print(self.names)
         self.mainwindow.set_names(self.names)
         self.mainwindow.clear_windows()
         super().close()
