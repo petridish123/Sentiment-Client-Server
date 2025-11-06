@@ -135,6 +135,7 @@ class QtWebsocket(QWidget):
             for i in message["NAMES"]:#self.players:
                 if int(i) == self.ID:
                     self.setWindowTitle(message["NAMES"][i])
+                    continue
                 self.players[int(i)].change_name(message["NAMES"][i])
 
 
