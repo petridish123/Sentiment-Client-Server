@@ -17,6 +17,8 @@ import asyncio
 
 import Shared.game
 import Server.Equations
+
+import re
 """
 Purpose of this class:
 Create a server from the gameserver class and give it a qt interface
@@ -64,7 +66,7 @@ class QTServer(QWidget):
         self.server.update_round.connect(self.new_round)
         self.server.start_game.connect(self.start_game)
 
-    def start_game(self, *args, **kwargs):
+    def start_game(self, *args, **kwargs) -> None:
         ID_players = None
         if "ID_players" in kwargs:
             ID_players = kwargs["ID_players"]
@@ -77,7 +79,7 @@ class QTServer(QWidget):
        
         self.equation = Server.Equations.equation(ids)        
 
-    def new_round(self, *args, **kwargs):
+    def new_round(self, *args, **kwargs) -> None:
         print(self.events)
         print(self.server.game.scores)
         t = 1
@@ -89,41 +91,41 @@ class QTServer(QWidget):
         self.equation.update_matrices(self.server.game.scores, self.events[t], t)
         self.equation.all_reputations(t)
        
-
-    async def running_task(self):
-
+    async def running_task(self) -> None:
+        """
+        This is how I get around having to start up the qt application and then
+        start the async server as a task. I would have used a lambda, but I wanted to keep track
+        of the server task so that I can close it cleanly.
+        """
         self.server_task = asyncio.create_task(self.run())
 
-
-    def create_event(self):
+    def create_event(self) -> None :
         if self.event_window is not None:
             self.event_window.close()
         print("attempting to create event window")
         self.event_window = eventWindow(self.server.ID_PLAYERS, self)
         self.event_window.show()
     
-    def define_camps(self):
+    def define_camps(self) -> None:
         if self.camp_window is not None:
             print(f"Camp window exists")
             self.camp_window.close()
         self.camp_window = campWindow(self)
         self.camp_window.show()
 
-    def define_names(self):
+    def define_names(self) -> None:
         if self.names_window is not None:
             print("Names window exists")
             self.names_window.close()
         self.names_window = nameWindow(self.server.ID_PLAYERS,self)
         self.names_window.show()
 
-    def clear_windows(self):
+    def clear_windows(self) -> None:
         self.camp_window = None
         self.event_window = None
         self.names_window = None
-            
-                
-
-    def handle_new_event(self,event : dict):
+                   
+    def handle_new_event(self,event : dict) -> None:
         """
         This takes in an event that follows the type:
         {"TYPE":"HUNT"|"STUN", ID:{"TO":True|False, "FROM":True|False, "WATCHER":True|False}}
@@ -149,17 +151,15 @@ class QTServer(QWidget):
                 self.events[self.server.t][i].append(event[i])
         # print(self.events)
     
-    def set_names(self, player_id_names : dict): # Need to open a window and map all the names to the player IDs
+    def set_names(self, player_id_names : dict) -> None: 
         self.player_id_names = player_id_names
         asyncio.create_task(self.server.send_names(self.player_id_names))
         
-    
-    def set_camps(self, camps):
+    def set_camps(self, camps) -> None:
         self.camps = camps
         asyncio.create_task(self.server.send_camps(self.camps))
 
-    
-    def closeEvent(self, a0):
+    def closeEvent(self, a0) -> None:
         print("Closing and cleaning up")
         if hasattr(self.server, "_close"):
             asyncio.create_task(self.server._close())
@@ -167,10 +167,8 @@ class QTServer(QWidget):
         self.server.game.save() # Saves in a json file
         self.server_task.cancel()
         a0.accept()
-    
-    
 
-    async def run(self):
+    async def run(self) -> None:
         await self.server.main()
 
 
@@ -219,7 +217,7 @@ class eventWindow(QWidget):
         self.Stun_button.clicked.connect(self.set_stun)
         self.layout.addWidget(self.Stun_button, self.cur_row, 2)
 
-    def info_button_creator(self, ID : int,to : bool = False, from_ : bool = False, watcher :bool = False):
+    def info_button_creator(self, ID : int,to : bool = False, from_ : bool = False, watcher :bool = False) -> callable:
         self.data[ID] = {"To" : False, "From": False, "Watcher": False}
         def _():
             if to:
@@ -231,11 +229,11 @@ class eventWindow(QWidget):
             # print(self.data)
         return _
 
-    def set_hunt(self): self.data["TYPE"] = "HUNT"
+    def set_hunt(self): self.data["TYPE"] = "HUNT" # These are my way of getting around lambda functions not being able to assign variables
     def set_stun(self): self.data["TYPE"] = "STUN"
 
 
-    def create_row(self, ID : int):
+    def create_row(self, ID : int) -> None:
         for i in self.label_names:
             col = int(i)
             name = f"Player {ID}"
@@ -251,7 +249,7 @@ class eventWindow(QWidget):
             self.layout.addWidget(button1, self.cur_row, col)
         self.cur_row += 1
 
-    def format_event(self):
+    def format_event(self) -> dict:
         event = {"TYPE" : self.data["TYPE"], "To":[], "From":[], "Watcher":[]}
         for id in self.data:
             if id != "TYPE": #The formatting is stupid right now and it isn't that good
@@ -259,10 +257,10 @@ class eventWindow(QWidget):
                 for type in self.data[id]:
                     if self.data[id][type]:
                         event[type].append(id)
-        self.data = event
+        self.data = event # This makes the events only count this round. May need to change this for the bots
         return self.data
 
-    def close(self):
+    def close(self) -> None:
         # Send the event to the server
         self.format_event()
         self.mainwindow.handle_new_event(self.data)
@@ -311,7 +309,7 @@ class nameWindow(QWidget):
             self.names[ID] = new_text
         return _
 
-    def close(self):
+    def close(self) -> None:
         # I need to make a QT window function that takes the names and sends them to the client.
         print(self.names)
         self.mainwindow.set_names(self.names)
@@ -337,9 +335,17 @@ class campWindow(QWidget):
 
         self.mainwindow : QTServer = mainwindow
 
-    def close(self):
+        self.input.textChanged.connect(self.int_check)
+
+    def int_check(self, new_text):# makes sure that it is only digits
+        new_re = re.search(r"^\d+$", new_text) 
+        if not new_re:
+            self.input.clear()
+
+    def close(self) -> None:
         # send the information to the main server
-        self.mainwindow.set_camps(self.input.text())
+
+        self.mainwindow.set_camps(self.input.text() if self.input.text() is not None else 3)
         self.mainwindow.clear_windows()
         super().close()
         self.deleteLater()
