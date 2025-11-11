@@ -39,3 +39,45 @@ When designing bots, it is important that they not only observe the potential mo
 
 An objective of this study is to see if bots who think in the reputation space (using reputations and beliefs about other players) will be able to 
 maximize their reputation and monetary profit in the GridHunt game and also potentially find strategies to play this collaborative game.
+
+# How to setup
+
+1) Set up a venv
+    ```
+    python -m venv venv
+    ```
+2) Install the libraries listed below:
+    - numpy
+    - qasync
+    - websockets
+    - PyQt6
+3) Install the shared files as a library
+    ```
+    python -m pip install ./Shared  (if Shared is in the directory with your venv)
+    ```
+4) Activate your venv by running
+    ```
+    ./venv/Scripts/activate
+    ```
+
+This concludes the setup and required libraries to run the program on your machine.
+
+# How to use
+## Setup server and client
+1) Run the server
+    ```
+    python ./QTServer.py
+    ```
+
+2) Run the number of clients specified in the QTServer (typically 3) by running this command in X terminals
+    ```
+    python ./qtwebsocket
+    ```
+
+This concludes the setup of the program, the following steps are instruction on how to interact with the program
+
+## Use client
+
+1) This is currently changing but will be updated when the project finalizes.
+
+## Use server
