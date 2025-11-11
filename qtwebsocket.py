@@ -31,6 +31,12 @@ class QtWebsocket(QWidget):
         self.layout = QGridLayout()
         self.setLayout(self.layout)
         self.resize(200,150)
+
+
+        self.round_num = 0
+        self.round_num_label = QLabel("Round: " + str(self.round_num))
+        self.layout.addWidget(self.round_num_label, 0 , 0)
+
         self.button = QPushButton("Submit")
         self.button.clicked.connect(self.send_allocation) # connect to a function
         self.layout.addWidget(self.button,0,1)
@@ -39,10 +45,8 @@ class QtWebsocket(QWidget):
         self.camp_button.clicked.connect(self.create_camp_menu) # Connect this to opening a camp window 
         self.layout.addWidget(self.camp_button, 0, 2)
 
-
-        self.round_num = 0
-        self.round_num_label = QLabel("Round: " + str(self.round_num))
-        self.layout.addWidget(self.round_num_label, 0 , 0)
+        self.camp_label = QLabel(f"Camp : {None}")
+        self.layout.addWidget(self.camp_label,0,4)
 
 
         self.row = 1
@@ -131,6 +135,7 @@ class QtWebsocket(QWidget):
             self.change_round_num(message["ROUND"])
         if "CAMPS" in message:
             self.camps = [i for i in range(1, 1 + int(message["CAMPS"]))]
+            
         if "NAMES" in message:
             for i in message["NAMES"]:#self.players:
                 if int(i) == self.ID:
@@ -172,6 +177,7 @@ class QtWebsocket(QWidget):
     
     def set_camp(self, camp):
         self.camp = camp
+        self.camp_label.setText(f"Camp : {self.camp}")
     
     def create_camp_menu(self):
         if self.window is not None:
@@ -209,11 +215,9 @@ class campWindow(QWidget):
         This window is going to look something like this:
         |------------------------------|-|[]|X|
         |              Camps                  |
-        | |Camp 1| |Camp 2| |Camp 3| ....     |
-        | Player1  Player4                    |
-        | Player2                             |
+        | |Camp 1| |Camp 2| |Camp 3|          |
+        | |Camp 4| |Camp 5|...                |
         |                                     |
-        | |Submit|                            |
         |-------------------------------------|
 
         where the |Camp X| is a button
@@ -223,7 +227,10 @@ class campWindow(QWidget):
         self.cur_col = 0
         self.cur_row = 0
 
-        for camp in camps: # This iterates over the camps and gets the name of the camp
+        for i, camp in enumerate(camps): # This iterates over the camps and gets the name of the camp
+            if i > 0 and i % 3 == 0:
+                self.cur_row += 1
+                self.cur_col = 0
             if type(camp) == type(dict):
                 pass # create the player labels
             name = f"camp {camp}"
@@ -233,14 +240,15 @@ class campWindow(QWidget):
             self.cur_col += 1
         self.cur_row += 1
     
-        self.submit_button = QPushButton("Submit")
-        self.submit_button.clicked.connect(self.close)
-        self.layout.addWidget(self.submit_button,self.cur_row+1,0)
+        # self.submit_button = QPushButton("Submit")
+        # self.submit_button.clicked.connect(self.close)
+        # self.layout.addWidget(self.submit_button,self.cur_row+1,0)
 
     def set_camp(self, ID : int) -> callable:
         
         def _():
             self.camp = ID
+            self.close()
         
         return _
 

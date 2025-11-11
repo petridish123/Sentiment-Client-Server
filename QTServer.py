@@ -344,8 +344,10 @@ class campWindow(QWidget):
 
     def close(self) -> None:
         # send the information to the main server
-
-        self.mainwindow.set_camps(self.input.text() if self.input.text() is not None else 3)
+        camp_num : int = 3
+        if not self.input.text() == "":
+            camp_num = int(self.input.text())
+        self.mainwindow.set_camps(camp_num)
         self.mainwindow.clear_windows()
         super().close()
         self.deleteLater()
