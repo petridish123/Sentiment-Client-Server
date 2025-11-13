@@ -81,3 +81,5 @@ This concludes the setup of the program, the following steps are instruction on 
 1) This is currently changing but will be updated when the project finalizes.
 
 ## Use server
+
+1) This will also be updated when the project finalizes
