@@ -14,8 +14,15 @@ import asyncio
 
 from Shared.game import player, sub_player
 
-url = "127.0.0.1"
+
+
 PORT = 8765
+
+try: # If you have an Ip address that you would like to keep secret from github lol
+    with open("ip_address.txt") as f:
+        url = f.readline()
+except:
+    url = "127.0.0.1" # Local host
 
 
 class QtWebsocket(QWidget):
@@ -274,6 +281,8 @@ def main():
     # sys.exit(app.exec())
     with loop:
         loop.run_forever()
+
+
 
 def set_style(app : QApplication, sheet : str):
     with open(sheet, "r") as f:
