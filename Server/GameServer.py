@@ -1,7 +1,7 @@
 import json, asyncio, websockets
 import Shared.game
 import Shared.signals
-PORT = 8765
+PORT = 8080
 
 class Server:
 
@@ -98,7 +98,7 @@ class Server:
 if __name__ == "__main__":
     try:
 
-        server = Server(3)
+        server = Server(3, url  = "0.0.0.0")
         asyncio.run(server.main())
     except KeyboardInterrupt:
         server.game.save()

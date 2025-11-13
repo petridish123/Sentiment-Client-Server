@@ -27,7 +27,7 @@ except:
 
 class QtWebsocket(QWidget):
 
-    def __init__(self,):
+    def __init__(self, url = "localhost"):
         super().__init__()
         self.game_running = False
 
@@ -64,6 +64,7 @@ class QtWebsocket(QWidget):
         self.round_allocations = {}
         self.cur_round = 0
 
+        self.url = url
         self.socket = None
 
         self.window = None
@@ -162,7 +163,7 @@ class QtWebsocket(QWidget):
     async def run(self):
         while not self.socket: # Keep trying to connect
             try:
-                self.socket = await websockets.connect("ws://localhost:8765")
+                self.socket = await websockets.connect(f"ws://{self.url}:8765")
             except Exception as e:
                 pass
                 
