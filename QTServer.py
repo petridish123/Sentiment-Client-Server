@@ -352,14 +352,6 @@ class campWindow(QWidget):
         super().close()
         self.deleteLater()
 
-"""
-TODO:
-
-- Send camps to the clients so they correctly open
-- make the UI cleaner and display the camp that is selected.
-- Save data
-- Refactor code so that it is a class that holds the windows, and the class runs the server
-"""
 
 
 if __name__ == "__main__":

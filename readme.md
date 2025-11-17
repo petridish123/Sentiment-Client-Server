@@ -83,3 +83,8 @@ This concludes the setup of the program, the following steps are instruction on 
 ## Use server
 
 1) This will also be updated when the project finalizes
+
+
+# Todo
+- Set up chrome books
+- Or Try running on a computer that recieves in and outward connections (linux)
