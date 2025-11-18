@@ -21,6 +21,7 @@ PORT = 8765
 try: # If you have an Ip address that you would like to keep secret from github lol
     with open("ip_address.txt") as f:
         url = f.readline()
+        print(url)
 except:
     url = "127.0.0.1" # Local host
 
@@ -163,7 +164,7 @@ class QtWebsocket(QWidget):
     async def run(self):
         while not self.socket: # Keep trying to connect
             try:
-                self.socket = await websockets.connect(f"ws://{self.url}:8765")
+                self.socket = await websockets.connect(f"ws://{self.url}:8080")
             except Exception as e:
                 pass
                 
