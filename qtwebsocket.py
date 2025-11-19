@@ -16,7 +16,6 @@ from Shared.game import player, sub_player
 
 
 
-PORT = 8765
 
 try: # If you have an Ip address that you would like to keep secret from github lol
     with open("ip_address.txt") as f:
@@ -25,10 +24,11 @@ try: # If you have an Ip address that you would like to keep secret from github 
 except:
     url = "127.0.0.1" # Local host
 
+PORT = 8080
 
 class QtWebsocket(QWidget):
 
-    def __init__(self, url = "localhost"):
+    def __init__(self, url = "localhost", port = "8080"):
         super().__init__()
         self.game_running = False
 
@@ -66,6 +66,7 @@ class QtWebsocket(QWidget):
         self.cur_round = 0
 
         self.url = url
+        self.port = port
         self.socket = None
 
         self.window = None
@@ -164,7 +165,7 @@ class QtWebsocket(QWidget):
     async def run(self):
         while not self.socket: # Keep trying to connect
             try:
-                self.socket = await websockets.connect(f"ws://{self.url}:8080")
+                self.socket = await websockets.connect(f"ws://{self.url}:{self.port}")
             except Exception as e:
                 pass
                 
@@ -278,7 +279,7 @@ def main():
     loop = QEventLoop(app)
     asyncio.set_event_loop(loop)
     # set_style(app, "C:/Users/Mango/Desktop/Python_server_client/Python-server/rules/style.css")
-    window = QtWebsocket()
+    window = QtWebsocket(url, PORT)
     window.show()
     # sys.exit(app.exec())
     with loop:
