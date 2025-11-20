@@ -358,7 +358,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     loop = QEventLoop()
     asyncio.set_event_loop(loop)
-    window = QTServer(1,url = "0.0.0.0", loop = loop, port = 8080)
+    window = QTServer(2,url = "0.0.0.0", loop = loop, port = 8080)
     window.show()
     with loop:
         loop.run_forever()
