@@ -22,7 +22,7 @@ try: # If you have an Ip address that you would like to keep secret from github 
         url = f.readline()
         print(url)
 except:
-    url = "127.0.0.1" # Local host
+    url = "localhost" # Local host
 
 PORT = 8080
 
